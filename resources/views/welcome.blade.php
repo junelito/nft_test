@@ -92,15 +92,14 @@
                 dataType:"JSON",
                 success: function(data)
                 {
+                    load_comment();
+                    $('#comment_form')[0].reset();
+                    $('#comment_id').val('0');
+                    $('#commentModal').modal('hide');
                     if(data.errors != '') {
-                        $('#comment_form')[0].reset();
-                        // $('#comment_message').html(data.errors);
                         $.each(data.errors, function(key, value) {
                             $('#comment_message').append('<div class="alert alert-danger">'+value+'</div');
-                        }); 
-                        $('#comment_id').val('0');
-                        $('#commentModal').modal('hide');
-                        load_comment();
+                        });    
                     }
                 },
                 error: function (xhr) {

@@ -39,24 +39,27 @@ class CommentController extends Controller
 
             $comments = Comment::where('parent_id', 0)->orderBy('id', 'DESC')->get();
 
+            $i = 0;
+            $array = [];
             foreach ($comments as $row) {
-                $output .= '
-                    <div class="panel panel-default">
-                    <div class="panel-heading">By <b>'.$row->username.'</b> on <i>'.$row->created_at.'</i></div>
-                    <div class="panel-body">'.$row->comment.'</div>
-                    <div class="panel-footer" align="right"><button type="button" class="btn btn-default reply" id="'.$row->id.'">Reply</button></div>
-                    </div>
-                    ';
-                $output .= $this->getReplyComments($row->id);
+                $array[$i]['id'] = $row->id;
+                $array[$i]['username'] = $row->username;
+                $array[$i]['comment'] = $row->comment;
+                $array[$i]['created_at'] = $row->created_at;
+                $array[$i]['margin_left'] = 0;
+                $array[$i]['layer'] = 1;
+                $array[$i]['children'][] = $this->getReplyComments($row->id);
+
+                $i++;
             }
+
+            return view('comment.comment', compact('array'));
         }
-        
-        echo $output;
     }
 
     private function getReplyComments($parentId = 0, $layer = 1)
     {
-        $output = '';
+        $array = [];
 
         if ($parentId == 0) {
             $marginleft = 0;
@@ -69,24 +72,21 @@ class CommentController extends Controller
 
         if ($comments) {
 
+            $i = 0;
+            
             foreach($comments as $row) {
-                
-                $replyBtn = '<button type="button" class="btn btn-default reply" id="'.$row->id.'">Reply</button>';
-                if ($layer >= 3) {
-                    $replyBtn = '';
-                }
+                $array[$i]['id'] = $row->id;
+                $array[$i]['username'] = $row->username;
+                $array[$i]['comment'] = $row->comment;
+                $array[$i]['created_at'] = $row->created_at;
+                $array[$i]['margin_left'] = $marginleft;
+                $array[$i]['layer'] = $layer;
+                $array[$i]['children'][] = $this->getReplyComments($row->id, $layer);
 
-                $output .= '
-                <div class="panel panel-default" style="margin-left:'.$marginleft.'px">
-                    <div class="panel-heading">By <b>'.$row->username.'</b> on <i>'.$row->created_at.'</i></div>
-                    <div class="panel-body">'.$row->comment.'</div>
-                    <div class="panel-footer" align="right">'.$replyBtn.'</div>
-                </div>
-                ';
-                $output .= $this->getReplyComments($row->id, $layer);
+                $i++;
             }
         }
 
-        return $output;
+        return $array;
     }
 }
