@@ -86,7 +86,7 @@
             // event.preventDefault();
             var form_data = $('#comment_form').serialize();
             $.ajax({
-                url: "/add_comment",
+                url: "add_comment",
                 method:"POST",
                 data:form_data,
                 dataType:"JSON",
@@ -116,9 +116,10 @@
         function load_comment()
         {
             var form_data = $('#comment_form').serialize();
+            var display = '';
             $.ajax({
                 data:form_data,
-                url: "/fetch_comment",
+                url: "fetch_comment",
                 method:"POST",
                 success:function(data)
                 {
